@@ -175,13 +175,15 @@ class Program
     {
         Console.Write("Enter movie title: ");
         string title = Console.ReadLine();
-        var members = memberCollection.FindMembersRentingMovie(title);
+        Member[] members = memberCollection.FindMembersRentingMovie(title);
 
-        if (members.Count > 0)
+        if (members.Length > 0)
         {
             Console.WriteLine("Members renting this movie:");
-            foreach (var member in members)
-                Console.WriteLine($"- {member.FullName}");
+            for (int i = 0; i < members.Length; i++)
+            {
+                Console.WriteLine($"- {members[i].FullName}");
+            }
         }
         else
         {

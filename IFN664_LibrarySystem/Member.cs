@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 
 namespace LibrarySystem
 {
@@ -9,7 +8,10 @@ namespace LibrarySystem
         public string LastName { get; }
         public string Password { get; }
         public string Phone { get; }
-        public List<Movie> BorrowedMovies { get; }
+
+        private const int MaxBorrow = 5;
+        private Movie[] borrowedMovies = new Movie[MaxBorrow];
+        private int borrowedCount = 0;
 
         public Member(string firstName, string lastName, string password, string phone)
         {
@@ -17,47 +19,66 @@ namespace LibrarySystem
             LastName = lastName;
             Password = password;
             Phone = phone;
-            BorrowedMovies = new List<Movie>();
         }
 
         public string FullName => $"{FirstName} {LastName}";
 
         public bool BorrowMovie(Movie movie)
         {
-            if (BorrowedMovies.Count >= 5) return false;
-            if (BorrowedMovies.Exists(m => m.Title == movie.Title)) return false;
+            if (borrowedCount >= MaxBorrow) return false;
+
+            for (int i = 0; i < borrowedCount; i++)
+            {
+                if (borrowedMovies[i].Title == movie.Title)
+                    return false;
+            }
+
             if (movie.AvailableCopies <= 0) return false;
 
-            BorrowedMovies.Add(movie);
+            borrowedMovies[borrowedCount++] = movie;
             movie.AvailableCopies--;
+            movie.BorrowCount++;
             return true;
         }
 
         public bool ReturnMovie(Movie movie)
         {
-            var borrowedMovie = BorrowedMovies.Find(m => m.Title == movie.Title);
-            if (borrowedMovie != null)
+            for (int i = 0; i < borrowedCount; i++)
             {
-                BorrowedMovies.Remove(borrowedMovie);
-                movie.AvailableCopies++;
-                return true;
-            }
+                if (borrowedMovies[i].Title == movie.Title)
+                {
+                    for (int j = i; j < borrowedCount - 1; j++)
+                        borrowedMovies[j] = borrowedMovies[j + 1];
 
+                    borrowedMovies[--borrowedCount] = null;
+                    movie.AvailableCopies++;
+                    return true;
+                }
+            }
             return false;
         }
 
         public void ListBorrowedMovies()
         {
-            if (BorrowedMovies.Count == 0)
+            if (borrowedCount == 0)
             {
                 Console.WriteLine("No movies currently borrowed.");
                 return;
             }
 
             Console.WriteLine("Movies currently borrowed:");
-            foreach (var movie in BorrowedMovies)
-                Console.WriteLine($"- {movie.Title}");
-
+            for (int i = 0; i < borrowedCount; i++)
+                Console.WriteLine($"- {borrowedMovies[i].Title}");
         }
+
+        public Movie[] GetBorrowedMovies()
+        {
+            Movie[] copy = new Movie[borrowedCount];
+            for (int i = 0; i < borrowedCount; i++)
+                copy[i] = borrowedMovies[i];
+            return copy;
+        }
+
+        public int BorrowedCount => borrowedCount;
     }
 }

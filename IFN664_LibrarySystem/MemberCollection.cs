@@ -1,8 +1,7 @@
 using System;
-using System.Linq;
-using System.Collections.Generic;
 
-namespace LibrarySystem;
+namespace LibrarySystem
+{
     public class MemberCollection
     {
         private Member[] members = new Member[1000];
@@ -17,7 +16,7 @@ namespace LibrarySystem;
             return true;
         }
 
-        public Member? FindMember(string firstName, string lastName)
+        public Member FindMember(string firstName, string lastName)
         {
             for (int i = 0; i < count; i++)
             {
@@ -26,42 +25,57 @@ namespace LibrarySystem;
             }
             return null;
         }
-        
+
         public bool RemoveMember(string firstName, string lastName)
         {
             for (int i = 0; i < count; i++)
             {
                 if (members[i].FirstName == firstName && members[i].LastName == lastName)
                 {
-                    if (members[i].BorrowedMovies.Count > 0)
+                    if (members[i].BorrowedCount > 0)
                         return false;
 
                     for (int j = i; j < count - 1; j++)
                         members[j] = members[j + 1];
 
-                    members[count - 1] = null!;
+                    members[count - 1] = null;
                     count--;
                     return true;
                 }
             }
             return false;
         }
-        
+
         public Member[] GetAllMembers()
         {
-            return members.Take(count).ToArray();
+            Member[] result = new Member[count];
+            for (int i = 0; i < count; i++)
+                result[i] = members[i];
+            return result;
         }
 
-        public List<Member> FindMembersRentingMovie(string movieTitle)
+        public Member[] FindMembersRentingMovie(string movieTitle)
         {
-            List<Member> rentingMembers = new();
+            Member[] temp = new Member[count];
+            int matchCount = 0;
+
             for (int i = 0; i < count; i++)
             {
-                if (members[i].BorrowedMovies.Exists(m => m.Title == movieTitle))
-                    rentingMembers.Add(members[i]);
+                Movie[] borrowed = members[i].GetBorrowedMovies();
+                for (int j = 0; j < borrowed.Length; j++)
+                {
+                    if (borrowed[j].Title == movieTitle)
+                    {
+                        temp[matchCount++] = members[i];
+                        break;
+                    }
+                }
             }
-            return rentingMembers;
+
+            Member[] result = new Member[matchCount];
+            for (int i = 0; i < matchCount; i++)
+                result[i] = temp[i];
+            return result;
         }
     }
-    
-    
+}

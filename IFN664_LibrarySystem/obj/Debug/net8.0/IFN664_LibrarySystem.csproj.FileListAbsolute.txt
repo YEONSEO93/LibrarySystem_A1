@@ -12,3 +12,4 @@
 /Users/yeonseo/RiderProjects/IFN664_LibrarySystem/IFN664_LibrarySystem/obj/Debug/net8.0/IFN664_LibrarySystem.pdb
 /Users/yeonseo/RiderProjects/IFN664_LibrarySystem/IFN664_LibrarySystem/obj/Debug/net8.0/IFN664_LibrarySystem.genruntimeconfig.cache
 /Users/yeonseo/RiderProjects/IFN664_LibrarySystem/IFN664_LibrarySystem/obj/Debug/net8.0/ref/IFN664_LibrarySystem.dll
+/Users/yeonseo/RiderProjects/IFN664_LibrarySystem/IFN664_LibrarySystem/obj/Debug/net8.0/IFN664_LibrarySystem.sourcelink.json

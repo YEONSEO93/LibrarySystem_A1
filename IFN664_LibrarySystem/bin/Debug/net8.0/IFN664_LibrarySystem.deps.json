@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "IFN664_LibrarySystem/1.0.0": {
+        "runtime": {
+          "IFN664_LibrarySystem.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "IFN664_LibrarySystem/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

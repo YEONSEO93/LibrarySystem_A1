@@ -1,0 +1,14 @@
+/Users/yeonseo/RiderProjects/IFN664_LibrarySystem/IFN664_LibrarySystem/bin/Debug/net8.0/IFN664_LibrarySystem
+/Users/yeonseo/RiderProjects/IFN664_LibrarySystem/IFN664_LibrarySystem/bin/Debug/net8.0/IFN664_LibrarySystem.deps.json
+/Users/yeonseo/RiderProjects/IFN664_LibrarySystem/IFN664_LibrarySystem/bin/Debug/net8.0/IFN664_LibrarySystem.runtimeconfig.json
+/Users/yeonseo/RiderProjects/IFN664_LibrarySystem/IFN664_LibrarySystem/bin/Debug/net8.0/IFN664_LibrarySystem.dll
+/Users/yeonseo/RiderProjects/IFN664_LibrarySystem/IFN664_LibrarySystem/bin/Debug/net8.0/IFN664_LibrarySystem.pdb
+/Users/yeonseo/RiderProjects/IFN664_LibrarySystem/IFN664_LibrarySystem/obj/Debug/net8.0/IFN664_LibrarySystem.GeneratedMSBuildEditorConfig.editorconfig
+/Users/yeonseo/RiderProjects/IFN664_LibrarySystem/IFN664_LibrarySystem/obj/Debug/net8.0/IFN664_LibrarySystem.AssemblyInfoInputs.cache
+/Users/yeonseo/RiderProjects/IFN664_LibrarySystem/IFN664_LibrarySystem/obj/Debug/net8.0/IFN664_LibrarySystem.AssemblyInfo.cs
+/Users/yeonseo/RiderProjects/IFN664_LibrarySystem/IFN664_LibrarySystem/obj/Debug/net8.0/IFN664_LibrarySystem.csproj.CoreCompileInputs.cache
+/Users/yeonseo/RiderProjects/IFN664_LibrarySystem/IFN664_LibrarySystem/obj/Debug/net8.0/IFN664_LibrarySystem.dll
+/Users/yeonseo/RiderProjects/IFN664_LibrarySystem/IFN664_LibrarySystem/obj/Debug/net8.0/refint/IFN664_LibrarySystem.dll
+/Users/yeonseo/RiderProjects/IFN664_LibrarySystem/IFN664_LibrarySystem/obj/Debug/net8.0/IFN664_LibrarySystem.pdb
+/Users/yeonseo/RiderProjects/IFN664_LibrarySystem/IFN664_LibrarySystem/obj/Debug/net8.0/IFN664_LibrarySystem.genruntimeconfig.cache
+/Users/yeonseo/RiderProjects/IFN664_LibrarySystem/IFN664_LibrarySystem/obj/Debug/net8.0/ref/IFN664_LibrarySystem.dll

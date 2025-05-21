@@ -1,10 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
-namespace LibrarySystem;
-
-public class MovieCollection
+namespace LibrarySystem
+{
+    public class MovieCollection
     {
         private class Node
         {
@@ -26,17 +24,16 @@ public class MovieCollection
 
         private int Hash(string key)
         {
-            int hash = 0;
+            int sum = 0;
             foreach (char c in key)
-                hash = (31 * hash + c) % SIZE;
-            return hash;
+                sum += c;
+            return sum % SIZE;
         }
 
         public void AddMovie(Movie movie)
         {
             int index = Hash(movie.Title);
             Node current = table[index];
-
             while (current != null)
             {
                 if (current.Key == movie.Title)
@@ -70,7 +67,6 @@ public class MovieCollection
         {
             var movie = GetMovie(title);
             if (movie == null) return;
-
             if (movie.RemoveCopies(number) && movie.TotalCopies == 0)
                 DeleteMovie(title);
         }
@@ -80,7 +76,6 @@ public class MovieCollection
             int index = Hash(title);
             Node prev = null;
             Node current = table[index];
-
             while (current != null)
             {
                 if (current.Key == title)
@@ -95,25 +90,58 @@ public class MovieCollection
             }
         }
 
-        public List<Movie> GetAllMovies()
+        public Movie[] GetAllMovies()
         {
-            var movies = new List<Movie>();
-            foreach (var node in table)
+            Movie[] result = new Movie[count];
+            int idx = 0;
+            foreach (Node node in table)
             {
                 Node current = node;
                 while (current != null)
                 {
-                    movies.Add(current.Value);
+                    result[idx++] = current.Value;
                     current = current.Next;
                 }
             }
-            return movies.OrderBy(m => m.Title).ToList();
+
+            for (int i = 0; i < idx - 1; i++)
+            {
+                int minIndex = i;
+                for (int j = i + 1; j < idx; j++)
+                {
+                    if (string.Compare(result[j].Title, result[minIndex].Title) < 0)
+                        minIndex = j;
+                }
+                var temp = result[i];
+                result[i] = result[minIndex];
+                result[minIndex] = temp;
+            }
+            return result;
         }
 
-        public List<Movie> GetTopThreeMovies()
+        public Movie[] GetTopThreeMovies()
         {
-            return GetAllMovies()
-                .OrderByDescending(m => m.BorrowCount)
-                .Take(3).ToList();
+            Movie[] all = GetAllMovies();
+            int len = all.Length;
+
+            for (int i = 0; i < len - 1; i++)
+            {
+                int maxIdx = i;
+                for (int j = i + 1; j < len; j++)
+                {
+                    if (all[j].BorrowCount > all[maxIdx].BorrowCount)
+                        maxIdx = j;
+                }
+                var temp = all[i];
+                all[i] = all[maxIdx];
+                all[maxIdx] = temp;
+            }
+
+            int top = len >= 3 ? 3 : len;
+            Movie[] result = new Movie[top];
+            for (int i = 0; i < top; i++)
+                result[i] = all[i];
+            return result;
         }
     }
+}

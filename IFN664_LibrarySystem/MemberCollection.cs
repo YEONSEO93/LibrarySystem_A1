@@ -4,7 +4,7 @@ namespace LibrarySystem
 {
     public class MemberCollection
     {
-        private Member[] members = new Member[1000];
+        private Member[] members = new Member[100];
         private int count = 0;
 
         public bool AddMember(Member member)

@@ -4,89 +4,127 @@ namespace LibrarySystem
 {
     public class MovieCollection
     {
-        private class Node
-        {
-            public string Key;
-            public Movie Value;
-            public Node Next;
+        private int SIZE;
+        private Movie[] table;
+        private bool[] deleted;
+        private int count = 0;
 
-            public Node(string key, Movie value)
-            {
-                Key = key;
-                Value = value;
-                Next = null;
-            }
+        // constructor 
+        public MovieCollection(int expectedCount)
+        {
+            double loadFactor = 0.7;
+            int suggestedSize = (int)(expectedCount / loadFactor);
+            SIZE = FindNextPrime(suggestedSize);
+
+            table = new Movie[SIZE];
+            deleted = new bool[SIZE];
         }
 
-        private const int SIZE = 1000;
-        private Node[] table = new Node[SIZE];
-        private int count = 0;
+        private int FindNextPrime(int start)
+        {
+            while (!IsPrime(start))
+                start++;
+            return start;
+        }
+
+        private bool IsPrime(int n)
+        {
+            if (n < 2) return false;
+            if (n == 2 || n == 3) return true;
+            if (n % 2 == 0) return false;
+            for (int i = 3; i * i <= n; i += 2)
+            {
+                if (n % i == 0) return false;
+            }
+            return true;
+        }
 
         private int Hash(string key)
         {
-            int sum = 0;
+            const int p = 31;
+            int m = SIZE;
+            long hash = 0;
+            long pow = 1;
             foreach (char c in key)
-                sum += c;
-            return sum % SIZE;
+            {
+                hash = (hash + (c - 'a' + 1) * pow) % m;
+                pow = (pow * p) % m;
+            }
+            return (int)hash;
         }
 
-        public void AddMovie(Movie movie)
+        private int FindIndex(string key)
+        {
+            int index = Hash(key);
+            int i = 0;
+            while (i < SIZE)
+            {
+                int probeIndex = (index + i * i) % SIZE;
+                if (table[probeIndex] == null)
+                    return -1;
+                if (!deleted[probeIndex] && table[probeIndex].Title == key)
+                    return probeIndex;
+                i++;
+            }
+            return -1;
+        }
+
+        public bool AddMovie(Movie movie)
         {
             int index = Hash(movie.Title);
-            Node current = table[index];
-            while (current != null)
-            {
-                if (current.Key == movie.Title)
-                {
-                    current.Value.AddCopies(movie.TotalCopies);
-                    return;
-                }
-                current = current.Next;
-            }
+            int i = 0;
 
-            Node newNode = new Node(movie.Title, movie);
-            newNode.Next = table[index];
-            table[index] = newNode;
-            count++;
+            while (i < SIZE)
+            {
+                int probeIndex = (index + i * i) % SIZE; // quadratic probing
+                if (table[probeIndex] == null || deleted[probeIndex])
+                {
+                    table[probeIndex] = movie;
+                    deleted[probeIndex] = false;
+                    count++;
+                    return true;
+                }
+                if (table[probeIndex].Title == movie.Title)
+                {
+                    table[probeIndex].AddCopies(movie.TotalCopies);
+                    return true;
+                }
+                i++;
+            }
+            return false; 
         }
 
         public Movie GetMovie(string title)
         {
-            int index = Hash(title);
-            Node current = table[index];
-            while (current != null)
+            int index = FindIndex(title);
+            if (index == -1) return null;
+            return table[index];
+        }
+
+        public bool RemoveMovieCopies(string title, int number)
+        {
+            int index = FindIndex(title);
+            if (index == -1)
             {
-                if (current.Key == title)
-                    return current.Value;
-                current = current.Next;
+                return false;
             }
-            return null;
-        }
 
-        public void RemoveMovieCopies(string title, int number)
-        {
-            var movie = GetMovie(title);
-            if (movie == null) return;
-            if (movie.RemoveCopies(number) && movie.TotalCopies == 0)
-                DeleteMovie(title);
-        }
+            var movie = table[index];
+            bool removed = movie.RemoveCopies(number);
 
-        private void DeleteMovie(string title)
-        {
-            int index = Hash(title);
-            Node prev = null;
-            Node current = table[index];
-            while (current != null)
+            if (removed)
             {
-                if (current.Key == title)
+                if (movie.TotalCopies == 0)
                 {
-                    if (prev == null) table[index] = current.Next;
-                    else prev.Next = current.Next;
+                    table[index] = null;
+                    deleted[index] = true;
                     count--;
-                    return;
                 }
-                prev = current;
-                current = current.Next;
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
@@ -94,54 +132,87 @@ namespace LibrarySystem
         {
             Movie[] result = new Movie[count];
             int idx = 0;
-            foreach (Node node in table)
+            for (int i = 0; i < SIZE; i++)
             {
-                Node current = node;
-                while (current != null)
+                if (table[i] != null && !deleted[i])
                 {
-                    result[idx++] = current.Value;
-                    current = current.Next;
+                    result[idx++] = table[i];
                 }
             }
 
             for (int i = 0; i < idx - 1; i++)
             {
-                int minIndex = i;
+                int min = i;
                 for (int j = i + 1; j < idx; j++)
                 {
-                    if (string.Compare(result[j].Title, result[minIndex].Title) < 0)
-                        minIndex = j;
+                    if (string.Compare(result[j].Title, result[min].Title) < 0)
+                    {
+                        min = j;
+                    }
                 }
                 var temp = result[i];
-                result[i] = result[minIndex];
-                result[minIndex] = temp;
+                result[i] = result[min];
+                result[min] = temp;
             }
+
             return result;
+        }
+
+        // ===== HEAP SECTION =====
+
+        private void Heapify(Movie[] array, int n, int i)
+        {
+            int largest = i;
+            int left = 2 * i + 1;
+            int right = 2 * i + 2;
+
+            if (left < n && array[left].BorrowCount > array[largest].BorrowCount)
+                largest = left;
+            if (right < n && array[right].BorrowCount > array[largest].BorrowCount)
+                largest = right;
+
+            if (largest != i)
+            {
+                var temp = array[i];
+                array[i] = array[largest];
+                array[largest] = temp;
+                Heapify(array, n, largest);
+            }
+        }
+
+        private void BuildMaxHeap(Movie[] array, int n)
+        {
+            for (int i = n / 2 - 1; i >= 0; i--)
+            {
+                Heapify(array, n, i);
+            }
         }
 
         public Movie[] GetTopThreeMovies()
         {
-            Movie[] all = GetAllMovies();
-            int len = all.Length;
-
-            for (int i = 0; i < len - 1; i++)
+            Movie[] movies = new Movie[count];
+            int idx = 0;
+            for (int i = 0; i < SIZE; i++)
             {
-                int maxIdx = i;
-                for (int j = i + 1; j < len; j++)
+                if (table[i] != null && !deleted[i])
                 {
-                    if (all[j].BorrowCount > all[maxIdx].BorrowCount)
-                        maxIdx = j;
+                    movies[idx++] = table[i];
                 }
-                var temp = all[i];
-                all[i] = all[maxIdx];
-                all[maxIdx] = temp;
             }
 
-            int top = len >= 3 ? 3 : len;
-            Movie[] result = new Movie[top];
+            BuildMaxHeap(movies, idx);
+
+            int top = idx >= 3 ? 3 : idx;
+            Movie[] mostBorrowedMovies = new Movie[top];
             for (int i = 0; i < top; i++)
-                result[i] = all[i];
-            return result;
+            {
+                mostBorrowedMovies[i] = movies[0];
+                movies[0] = movies[idx - 1];
+                idx--;
+                Heapify(movies, idx, 0);
+            }
+
+            return mostBorrowedMovies;
         }
     }
 }

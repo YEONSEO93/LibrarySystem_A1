@@ -25,19 +25,31 @@ namespace LibrarySystem
 
         public bool BorrowMovie(Movie movie)
         {
-            if (borrowedCount >= MaxBorrow) return false;
+            if (borrowedCount >= MaxBorrow)
+            {
+                Console.WriteLine("\nYou have reached the borrowing limit (5 movies).");
+                return false;
+            }
 
             for (int i = 0; i < borrowedCount; i++)
             {
                 if (borrowedMovies[i].Title == movie.Title)
+                {
+                    Console.WriteLine("\nYou have already borrowed this movie.");
                     return false;
+                }
             }
 
-            if (movie.AvailableCopies <= 0) return false;
+            if (movie.AvailableCopies <= 0)
+            {
+                Console.WriteLine("\nNo copies available for borrowing.");
+                return false;
+            }
 
             borrowedMovies[borrowedCount++] = movie;
             movie.AvailableCopies--;
             movie.BorrowCount++;
+            Console.WriteLine($"\nYou have successfully borrowed \"{movie.Title}\".");
             return true;
         }
 
@@ -52,9 +64,11 @@ namespace LibrarySystem
 
                     borrowedMovies[--borrowedCount] = null;
                     movie.AvailableCopies++;
+                    Console.WriteLine($"\nYou have successfully returned \"{movie.Title}\".");
                     return true;
                 }
             }
+            Console.WriteLine("\nYou have not borrowed this movie."); 
             return false;
         }
 
@@ -62,11 +76,11 @@ namespace LibrarySystem
         {
             if (borrowedCount == 0)
             {
-                Console.WriteLine("No movies currently borrowed.");
+                Console.WriteLine("\nNo movies currently borrowed.");
                 return;
             }
 
-            Console.WriteLine("Movies currently borrowed:");
+            Console.WriteLine("\nMovies currently borrowed:");
             for (int i = 0; i < borrowedCount; i++)
                 Console.WriteLine($"- {borrowedMovies[i].Title}");
         }

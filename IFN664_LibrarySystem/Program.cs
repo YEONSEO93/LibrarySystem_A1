@@ -1,20 +1,23 @@
-﻿using System;
+﻿
+using System;
 using LibrarySystem;
 
 class Program
 {
-    static MovieCollection movieCollection = new MovieCollection();
+    static MovieCollection movieCollection = new MovieCollection(1000); // max size: 1000
     static MemberCollection memberCollection = new MemberCollection();
 
     static void Main(string[] args)
     {
+        LoadSampleData();
+
         while (true)
         {
             Console.WriteLine("\n--- Main Menu ---");
-            Console.WriteLine("1. Staff Login");
+            Console.WriteLine("\n1. Staff Login");
             Console.WriteLine("2. Member Login");
             Console.WriteLine("3. Exit");
-            Console.Write("Select option: ");
+            Console.Write("\nSelect option: ");
             string choice = Console.ReadLine();
 
             if (choice == "1") StaffLogin();
@@ -24,8 +27,25 @@ class Program
         }
     }
 
+    static void LoadSampleData()
+    {
+        movieCollection.AddMovie(new Movie("Inception", "sci-fi", "M15+", 148, 5));
+        movieCollection.AddMovie(new Movie("Harry Potter", "fantasy", "PG", 152, 4));
+        movieCollection.AddMovie(new Movie("Frozen", "animated", "G", 102, 3));
+        movieCollection.AddMovie(new Movie("The Godfather", "drama", "MA15+", 175, 2));
+        movieCollection.AddMovie(new Movie("Avengers", "action", "M15+", 181, 3));
+
+        memberCollection.AddMember(new Member("Yeonseo", "Ko", "1234", "0412345678"));
+        memberCollection.AddMember(new Member("Gyuri", "Park", "5678", "0412349876"));
+        memberCollection.AddMember(new Member("Emily", "Smith", "0000", "0499999999"));
+        memberCollection.AddMember(new Member("John", "Doe", "1111", "0488888888"));
+        memberCollection.AddMember(new Member("Emma", "Johnson", "2222", "0477777777"));
+    }
+
     static void StaffLogin()
     {
+        Console.Write("\nStaff login selected");
+
         Console.Write("\nEnter username: ");
         var user = Console.ReadLine();
         Console.Write("Enter password: ");
@@ -34,7 +54,7 @@ class Program
         if (user == "staff" && pass == "today123")
             StaffMenu();
         else
-            Console.WriteLine("Incorrect credentials.");
+            Console.WriteLine("\nIncorrect credentials.");
     }
 
     static void StaffMenu()
@@ -42,14 +62,14 @@ class Program
         while (true)
         {
             Console.WriteLine("\n--- Staff Menu ---");
-            Console.WriteLine("1. Add Movie");
+            Console.WriteLine("\n1. Add Movie");
             Console.WriteLine("2. Remove Movie Copies");
             Console.WriteLine("3. Register New Member");
             Console.WriteLine("4. Remove Member");
             Console.WriteLine("5. Find Member Phone");
             Console.WriteLine("6. Find Members Renting a Movie");
             Console.WriteLine("7. Back to Main Menu");
-            Console.Write("Select option: ");
+            Console.Write("\nSelect option: ");
             string choice = Console.ReadLine();
 
             if (choice == "1") AddMovie();
@@ -65,6 +85,8 @@ class Program
 
     static void MemberLogin()
     {
+        Console.Write("\nStaff login selected");
+
         Console.Write("\nEnter first name: ");
         string f = Console.ReadLine();
         Console.Write("Enter last name: ");
@@ -76,7 +98,7 @@ class Program
         if (member != null && member.Password == p)
             MemberMenu(member);
         else
-            Console.WriteLine("Login failed.");
+            Console.WriteLine("\nLogin failed.");
     }
 
     static void MemberMenu(Member member)
@@ -84,14 +106,14 @@ class Program
         while (true)
         {
             Console.WriteLine("\n--- Member Menu ---");
-            Console.WriteLine("1. Display All Movies");
+            Console.WriteLine("\n1. Display All Movies");
             Console.WriteLine("2. Display Movie Information");
             Console.WriteLine("3. Borrow Movie");
             Console.WriteLine("4. Return Movie");
             Console.WriteLine("5. List Borrowed Movies");
             Console.WriteLine("6. Display Top 3 Borrowed Movies");
             Console.WriteLine("7. Back to Main Menu");
-            Console.Write("Select option: ");
+            Console.Write("\nSelect option: ");
             string choice = Console.ReadLine();
 
             if (choice == "1") DisplayAllMovies();
@@ -109,17 +131,54 @@ class Program
     {
         Console.Write("Movie Title: ");
         string title = Console.ReadLine();
-        Console.Write("Genre: ");
-        string genre = Console.ReadLine();
-        Console.Write("Classification (G/PG/M15+/MA15+): ");
-        string classification = Console.ReadLine();
-        Console.Write("Duration (minutes): ");
-        int duration = int.Parse(Console.ReadLine());
-        Console.Write("Number of copies: ");
-        int copies = int.Parse(Console.ReadLine());
 
-        var movie = new Movie(title, genre, classification, duration, copies);
-        movieCollection.AddMovie(movie);
+        var existing = movieCollection.GetMovie(title);
+
+        if (existing != null)
+        {
+            // existing movie → get input about num of copy
+            Console.Write($"\"{title}\" already exists. Enter number of additional copies: ");
+            int additionalCopies = int.Parse(Console.ReadLine());
+
+            var movie = new Movie(title, existing.Genre, existing.Classification, existing.Duration, additionalCopies);
+            bool added = movieCollection.AddMovie(movie);
+
+            if (added)
+            {
+                var updated = movieCollection.GetMovie(title);
+                Console.WriteLine("Additional copies added.");
+                Console.WriteLine($"{updated.Title} now has {updated.TotalCopies} total copies ({updated.AvailableCopies} available).");
+            }
+            else
+            {
+                Console.WriteLine("Failed to add additional copies.");
+            }
+        }
+        else
+        {
+            // add a new movie → get all info of the movie
+            Console.Write("Genre: ");
+            string genre = Console.ReadLine();
+            Console.Write("Classification (G/PG/M15+/MA15+): ");
+            string classification = Console.ReadLine();
+            Console.Write("Duration (minutes): ");
+            int duration = int.Parse(Console.ReadLine());
+            Console.Write("Number of copies: ");
+            int copies = int.Parse(Console.ReadLine());
+
+            var movie = new Movie(title, genre, classification, duration, copies);
+            bool added = movieCollection.AddMovie(movie);
+
+            if (added)
+            {
+                Console.WriteLine("Movie added successfully.");
+                Console.WriteLine(movie);
+            }
+            else
+            {
+                Console.WriteLine("Failed to add movie. Hash table may be full.");
+            }
+        }
     }
 
     static void RemoveMovieCopies()
@@ -129,7 +188,31 @@ class Program
         Console.Write("Enter number of copies to remove: ");
         int copies = int.Parse(Console.ReadLine());
 
-        movieCollection.RemoveMovieCopies(title, copies);
+        var movie = movieCollection.GetMovie(title);
+        if (movie == null)
+        {
+            Console.WriteLine("\nMovie not found.");
+            return;
+        }
+
+        bool removed = movieCollection.RemoveMovieCopies(title, copies);
+        if (removed)
+        {
+            Console.WriteLine($"{copies} copies of \"{title}\" have been removed.");
+
+            if (movie.TotalCopies == 0)
+            {
+                Console.WriteLine($"All copies removed. \"{title}\" has been deleted from the system.");
+            }
+            else
+            {
+                Console.WriteLine($"\"{title}\" now has {movie.TotalCopies} total copies ({movie.AvailableCopies} available).");
+            }
+        }
+        else
+        {
+            Console.WriteLine("Cannot remove more copies than are available.");
+        }
     }
 
     static void RegisterMember()
@@ -143,8 +226,18 @@ class Program
         Console.Write("Set 4-digit password: ");
         string password = Console.ReadLine();
 
+        if (password.Length != 4 || !int.TryParse(password, out _))
+        {
+            Console.WriteLine("Password must be a four-digit number.");
+            return;
+        }
+
         var member = new Member(firstName, lastName, password, phone);
-        memberCollection.AddMember(member);
+        bool added = memberCollection.AddMember(member);
+        if (added)
+            Console.WriteLine("\nMember registered successfully.");
+        else
+            Console.WriteLine("\nRegistration failed. Member already exists.");
     }
 
     static void RemoveMember()
@@ -154,7 +247,24 @@ class Program
         Console.Write("Last Name: ");
         string lastName = Console.ReadLine();
 
-        memberCollection.RemoveMember(firstName, lastName);
+        var member = memberCollection.FindMember(firstName, lastName);
+        if (member == null)
+        {
+            Console.WriteLine("Member not found.");
+            return;
+        }
+
+        if (member.BorrowedCount > 0)
+        {
+            Console.WriteLine("This member is currently holding movies. All movies must be returned before removal.");
+            return;
+        }
+
+        bool removed = memberCollection.RemoveMember(firstName, lastName);
+        if (removed)
+            Console.WriteLine("Member has been successfully removed.");
+        else
+            Console.WriteLine("Failed to remove member.");
     }
 
     static void FindMemberPhone()
@@ -166,14 +276,14 @@ class Program
 
         var member = memberCollection.FindMember(firstName, lastName);
         if (member != null)
-            Console.WriteLine($"Phone: {member.Phone}");
+            Console.WriteLine($"\nPhone: {member.Phone}");
         else
             Console.WriteLine("Member not found.");
     }
 
     static void FindMembersRentingMovie()
     {
-        Console.Write("Enter movie title: ");
+        Console.Write("\nEnter movie title: ");
         string title = Console.ReadLine();
         Member[] members = memberCollection.FindMembersRentingMovie(title);
 
@@ -200,38 +310,38 @@ class Program
 
     static void DisplayMovieInfo()
     {
-        Console.Write("Enter movie title: ");
+        Console.Write("\nEnter movie title: ");
         string title = Console.ReadLine();
         var movie = movieCollection.GetMovie(title);
 
         if (movie != null)
             Console.WriteLine(movie);
         else
-            Console.WriteLine("Movie not found.");
+            Console.WriteLine("\nMovie not found.");
     }
 
     static void BorrowMovie(Member member)
     {
-        Console.Write("Enter movie title to borrow: ");
+        Console.Write("\nEnter movie title to borrow: ");
         string title = Console.ReadLine();
         var movie = movieCollection.GetMovie(title);
 
         if (movie != null)
             member.BorrowMovie(movie);
         else
-            Console.WriteLine("Movie not found.");
+            Console.WriteLine("\nMovie not found.");
     }
 
     static void ReturnMovie(Member member)
     {
-        Console.Write("Enter movie title to return: ");
+        Console.Write("\nEnter movie title to return: ");
         string title = Console.ReadLine();
         var movie = movieCollection.GetMovie(title);
 
         if (movie != null)
             member.ReturnMovie(movie);
         else
-            Console.WriteLine("Movie not found.");
+            Console.WriteLine("\nMovie not found.");
     }
 
     static void DisplayTopThreeMovies()

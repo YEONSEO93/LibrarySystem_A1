@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/yeonseo/RiderProjects/IFN664_LibrarySystem/IFN664_LibrarySystem/IFN664_LibrarySystem.csproj": {}
+    "/Users/yeonseo/Downloads/IFN664_ A1 2/IFN664_LibrarySystem/IFN664_LibrarySystem/IFN664_LibrarySystem.csproj": {}
   },
   "projects": {
-    "/Users/yeonseo/RiderProjects/IFN664_LibrarySystem/IFN664_LibrarySystem/IFN664_LibrarySystem.csproj": {
+    "/Users/yeonseo/Downloads/IFN664_ A1 2/IFN664_LibrarySystem/IFN664_LibrarySystem/IFN664_LibrarySystem.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/yeonseo/RiderProjects/IFN664_LibrarySystem/IFN664_LibrarySystem/IFN664_LibrarySystem.csproj",
+        "projectUniqueName": "/Users/yeonseo/Downloads/IFN664_ A1 2/IFN664_LibrarySystem/IFN664_LibrarySystem/IFN664_LibrarySystem.csproj",
         "projectName": "IFN664_LibrarySystem",
-        "projectPath": "/Users/yeonseo/RiderProjects/IFN664_LibrarySystem/IFN664_LibrarySystem/IFN664_LibrarySystem.csproj",
+        "projectPath": "/Users/yeonseo/Downloads/IFN664_ A1 2/IFN664_LibrarySystem/IFN664_LibrarySystem/IFN664_LibrarySystem.csproj",
         "packagesPath": "/Users/yeonseo/.nuget/packages/",
-        "outputPath": "/Users/yeonseo/RiderProjects/IFN664_LibrarySystem/IFN664_LibrarySystem/obj/",
+        "outputPath": "/Users/yeonseo/Downloads/IFN664_ A1 2/IFN664_LibrarySystem/IFN664_LibrarySystem/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/yeonseo/.nuget/NuGet/NuGet.Config"
